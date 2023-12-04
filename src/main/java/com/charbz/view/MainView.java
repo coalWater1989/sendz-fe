@@ -3,12 +3,15 @@ package com.charbz.view;
 import com.charbz.model.Send;
 import com.charbz.service.SendzService;
 import com.charbz.service.UserService;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -36,13 +39,12 @@ public class MainView extends VerticalLayout {
     private HorizontalLayout topMenu = new HorizontalLayout();
     private HorizontalLayout topMenuLeft = new HorizontalLayout();
     private HorizontalLayout topMenuRight = new HorizontalLayout();
+    private HorizontalLayout footerLayout = new HorizontalLayout();
     private VerticalLayout viewSendsLayout = new VerticalLayout();
     private VerticalLayout logSendsLayout = new VerticalLayout();
     private VerticalLayout viewSessionsLayout = new VerticalLayout();
     private VerticalLayout loginLayout = new VerticalLayout();
     private VerticalLayout signupLayout = new VerticalLayout();
-
-    //TODO set 'enter' action
 
     private ComboBox gymsCb = new ComboBox<>("Gym");
     private ComboBox gradesCb = new ComboBox<>("Grade");
@@ -72,7 +74,9 @@ public class MainView extends VerticalLayout {
     public MainView(SendzService sendzService, UserService userService) {
         this.sendzService = sendzService;
         this.userService = userService;
-        this.addClassName("mainview");
+
+        addClassName("mainview");
+        setSizeFull();
 
         addButtonListeners();
         generateTopMenu();
@@ -81,8 +85,11 @@ public class MainView extends VerticalLayout {
         generateViewSessionsLayout();
         generateLoginLayout();
         generateSignupLayout();
+        generateFooterLayout();
+        setAlphaBackgroundLayouts();
 
         add(topMenu);
+        add(footerLayout);
     }
 
     private void addButtonListeners() {
@@ -123,6 +130,7 @@ public class MainView extends VerticalLayout {
 
         logoutBt.addClickListener(clickEvent -> {
             Dialog confirmLogoutDialog = new Dialog("Confirm logout?");
+            confirmLogoutDialog.setClassName("alpha-layouts");
             Button okBt = new Button("Ok");
             okBt.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
             Button cancelBt = new Button("Cancel");
@@ -159,6 +167,9 @@ public class MainView extends VerticalLayout {
         mySendsBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         mySessionsBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         logSendsBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        loginBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        signupBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        logoutBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
     }
 
     private void generateTopMenu() {
@@ -169,11 +180,11 @@ public class MainView extends VerticalLayout {
         topMenu.addClassName("topMenu");
 
         topMenu.setWidth("100%");
-        topMenu.getStyle().set("border-bottom", "1px solid #36485f");
         topMenuLeft.add(mySendsBt, mySessionsBt, logSendsBt);
 
         if (loggedIn) {
             Button userBt = new Button(currentUser);
+            userBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
             userBt.addClickListener(clickEvent -> {
                 UserView userView = new UserView(currentUser, userService);
                 userView.open();
@@ -196,9 +207,8 @@ public class MainView extends VerticalLayout {
         topMenu.add(topMenuLeft, topMenuRight);
     }
 
-    private void openUserDialog() {
-
-    }
+    //TODO refactor
+    //TODO no tab on show password
 
     private VerticalLayout generateViewSendsLayout() {
         viewSendsLayout.removeAll();
@@ -244,9 +254,6 @@ public class MainView extends VerticalLayout {
             viewSendsLayout.add(loginMessageTxt);
         }
 
-        //TODO ajouter une photo
-        //TODO ajouter une page de profile
-
         viewSendsLayout.setAlignItems(Alignment.CENTER);
         viewSendsLayout.setJustifyContentMode(JustifyContentMode.CENTER);
 
@@ -269,7 +276,7 @@ public class MainView extends VerticalLayout {
 
             Button logSendBt = new Button("Log Send");
             logSendBt.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
-
+            logSendBt.addClickShortcut(Key.ENTER);
             logSendBt.addClickListener(clickEvent -> {
                 Send send = new Send();
 
@@ -345,6 +352,9 @@ public class MainView extends VerticalLayout {
 
         return logSendsLayout;
     }
+
+    //TODO button setClicked nouvelle couleur
+    //TODO changer login pis signup en Dialog
 
     private void initComboboxes() {
         gymsCb.addFocusListener(focusEvent -> {
@@ -423,7 +433,9 @@ public class MainView extends VerticalLayout {
         loginLayout.add(passwordField);
 
         Button loginBt = new Button("Login");
+        loginBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
 
+        loginBt.addClickShortcut(Key.ENTER);
         loginBt.addClickListener(clickEvent -> {
             Text text = new Text("");
             loginLayout.remove(text);
@@ -473,7 +485,7 @@ public class MainView extends VerticalLayout {
         signupLayout.add(confirmPasswordField);
 
         Button signupBt = new Button("Signup");
-
+        signupBt.addClickShortcut(Key.ENTER);
         signupBt.addClickListener(clickEvent -> {
             if (!passwordField.getValue().equals(confirmPasswordField.getValue())) {
                 Notification notification = Notification.show("Passwords must match!", 2000, Notification.Position.MIDDLE);
@@ -502,5 +514,38 @@ public class MainView extends VerticalLayout {
         signupLayout.setAlignItems(Alignment.CENTER);
         signupLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         signupLayout.add(signupText, userTf, passwordField, confirmPasswordField, signupBt);
+    }
+
+    private void generateFooterLayout() {
+        Text footerTxt = new Text("SENDZ APP by Charbz. © 2023");
+
+        Button facebookButton = new Button("",
+                new Icon(VaadinIcon.FACEBOOK_SQUARE));
+        facebookButton.setIconAfterText(true);
+
+        Button emailButton = new Button("",
+                new Icon(VaadinIcon.ENVELOPE));
+        emailButton.setIconAfterText(true);
+
+        Button youtubeButton = new Button("",
+                new Icon(VaadinIcon.YOUTUBE_SQUARE));
+        youtubeButton.setIconAfterText(true);
+
+        footerLayout.add(footerTxt);
+        footerLayout.add(facebookButton);
+        footerLayout.add(emailButton);
+        footerLayout.add(youtubeButton);
+        footerLayout.setWidth("100%");
+        footerLayout.setAlignItems(Alignment.CENTER);
+        footerLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+    }
+
+    private void setAlphaBackgroundLayouts() {
+        viewSendsLayout.setClassName("alpha-layouts");
+        logSendsLayout.setClassName("alpha-layouts");
+        viewSessionsLayout.setClassName("alpha-layouts");
+        loginLayout.setClassName("alpha-layouts");
+        signupLayout.setClassName("alpha-layouts");
+        footerLayout.setClassName("footer-layout");
     }
 }

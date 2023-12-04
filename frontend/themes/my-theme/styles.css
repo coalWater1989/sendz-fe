@@ -18,23 +18,37 @@ vaadin-text-field.bordered::part(input-field) {
 }
 
 table, th, td {
-  border: 3px solid black;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-collapse: collapse;
-  border-color: #304155;
 }
 
 th, td {
-  padding: 15px;
+  padding: 7px;
 }
 
 .mainview {
-    background-image: url("../frontend/images/LaDark.jpg");
+    background-image: url("LaDark.jpg");
+    background-size: cover;
+    background-repeat: no-repeat
 }
 
 .topMenu {
-    border-bottom: 20px;
-    border-bottom-color: #ff0000;
     padding-bottom: 10px;
+}
+
+.alpha-layouts {
+    background-color: rgba(0, 0, 0, 0.65);
+}
+
+.footer-layout {
+    background-color: rgba(0, 0, 0, 0.90);
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding-bottom: 12px;
+    padding-top: 12px;
+    text-align: center;
 }
 
 .view-sends {
@@ -43,4 +57,11 @@ th, td {
     padding: 20px;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+[theme~="dark"] {
+    --lumo-base-color: rgba(0, 0, 0, 0.75);
+    --lumo-primary-color: hsl(122, 96%, 47%);
+    --lumo-primary-color-50pct: hsl(122, 96%, 47%, 0.5);
+    --lumo-primary-color-10pct: hsl(122, 96%, 47%, 0.1);
 }

@@ -13,11 +13,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.FileBuffer;
-import com.vaadin.flow.component.upload.receivers.FileData;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import org.springframework.http.ResponseEntity;
 
+import javax.imageio.ImageIO;
 import javax.sql.rowset.serial.SerialBlob;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -31,6 +32,7 @@ public class UserView extends Dialog {
         verticalLayout = new VerticalLayout();
         horizontalButtonLayout = new HorizontalLayout();
 
+        this.setClassName("alpha-layouts");
         this.setHeaderTitle("User profile: " + username);
 
         TextField firstNameTx = new TextField("First name");
@@ -45,13 +47,24 @@ public class UserView extends Dialog {
         firstNameTx.setValue(firstName != null ? firstName : "");
         lastNameTx.setValue(lastName != null ? lastName : "");
 
-        FileBuffer fileBuffer = new FileBuffer();
-        Upload upload = new Upload(fileBuffer);
-        upload.setMaxHeight(600, Unit.PIXELS);
-        upload.setMaxWidth(600, Unit.PIXELS);
-
-        upload.setAcceptedFileTypes("jpg", "png");
+        MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
+        Upload upload = new Upload(buffer);
+        upload.setMaxHeight(200, Unit.PIXELS);
+        upload.setMaxWidth(200, Unit.PIXELS);
+        upload.setAcceptedFileTypes("image/jpeg", "image/jpg", "image/png");
         upload.setMaxFiles(1);
+
+        ByteArrayOutputStream pngContent = new ByteArrayOutputStream();
+
+        upload.addSucceededListener(event -> {
+            String attachmentName = event.getFileName();
+            try {
+                BufferedImage inputImage = ImageIO.read(buffer.getInputStream(attachmentName));
+                ImageIO.write(inputImage, "png", pngContent);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         Button saveBt = new Button("Save");
         saveBt.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
@@ -65,25 +78,11 @@ public class UserView extends Dialog {
         saveBt.addClickListener(buttonClickEvent -> {
             user.setFirstName(firstNameTx.getValue());
             user.setLastName(lastNameTx.getValue());
-
             try {
-                FileData fileData = fileBuffer.getFileData();
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                byte[] buffer = new byte[40000];
-                int count;
-                while (true) {
-
-                    if (!((count = fileBuffer.getInputStream().read(buffer)) != -1)) break;
-                    output.write(buffer, 0, count);
-                }
-
-                if (fileData != null) {
-                    user.setImage(new SerialBlob(output.toByteArray()));
-                }
-            } catch (IOException | SQLException e) {
+                user.setImage(new SerialBlob(pngContent.toByteArray()));
+            } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-
             userService.updateUserInfo(user);
             this.close();
 
