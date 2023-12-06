@@ -1,4 +1,4 @@
-package com.charbz.view;
+package com.charbz.view.dialog;
 
 import com.charbz.model.User;
 import com.charbz.service.UserService;
@@ -23,12 +23,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class UserView extends Dialog {
+public class UserDialog extends Dialog {
 
     private VerticalLayout verticalLayout;
     private HorizontalLayout horizontalButtonLayout;
 
-    public UserView(String username, UserService userService) {
+    public UserDialog(String username, UserService userService) {
         verticalLayout = new VerticalLayout();
         horizontalButtonLayout = new HorizontalLayout();
 

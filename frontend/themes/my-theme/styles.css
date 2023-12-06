@@ -32,6 +32,10 @@ th, td {
     background-repeat: no-repeat
 }
 
+.button-clicked {
+    background-color: rgba(144, 189, 249, 0.65);
+}
+
 .topMenu {
     padding-bottom: 10px;
 }

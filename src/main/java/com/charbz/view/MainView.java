@@ -3,6 +3,7 @@ package com.charbz.view;
 import com.charbz.model.Send;
 import com.charbz.service.SendzService;
 import com.charbz.service.UserService;
+import com.charbz.view.dialog.UserDialog;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -99,6 +100,7 @@ public class MainView extends VerticalLayout {
             remove(viewSendsLayout);
             remove(signupLayout);
             remove(loginLayout);
+            setButtonClicked(mySendsBt);
             viewSendsLayout = generateViewSendsLayout();
             add(viewSendsLayout);
         });
@@ -108,6 +110,7 @@ public class MainView extends VerticalLayout {
             remove(logSendsLayout);
             remove(signupLayout);
             remove(loginLayout);
+            setButtonClicked(mySessionsBt);
             add(viewSessionsLayout);
         });
 
@@ -116,8 +119,9 @@ public class MainView extends VerticalLayout {
             remove(viewSessionsLayout);
             remove(signupLayout);
             remove(loginLayout);
-            logSendsLayout = generateLogSendsLayout();
+            setButtonClicked(logSendsBt);
             add(logSendsLayout);
+            logSendsLayout = generateLogSendsLayout();
         });
 
         loginBt.addClickListener(clickEvent -> {
@@ -125,6 +129,7 @@ public class MainView extends VerticalLayout {
             remove(viewSessionsLayout);
             remove(logSendsLayout);
             remove(signupLayout);
+            setButtonClicked(loginBt);
             add(loginLayout);
         });
 
@@ -162,6 +167,7 @@ public class MainView extends VerticalLayout {
             remove(logSendsLayout);
             remove(loginLayout);
             add(signupLayout);
+            setButtonClicked(signupBt);
         });
 
         mySendsBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
@@ -170,6 +176,16 @@ public class MainView extends VerticalLayout {
         loginBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         signupBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         logoutBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+    }
+
+    private void setButtonClicked(Button buttonClicked) {
+        mySendsBt.setClassName("");
+        mySessionsBt.setClassName("");
+        logSendsBt.setClassName("");
+        loginBt.setClassName("");
+        logoutBt.setClassName("");
+        signupBt.setClassName("");
+        buttonClicked.setClassName("button-clicked");
     }
 
     private void generateTopMenu() {
@@ -186,8 +202,8 @@ public class MainView extends VerticalLayout {
             Button userBt = new Button(currentUser);
             userBt.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
             userBt.addClickListener(clickEvent -> {
-                UserView userView = new UserView(currentUser, userService);
-                userView.open();
+                UserDialog userDialog = new UserDialog(currentUser, userService);
+                userDialog.open();
             });
             topMenuRight.add(userBt, logoutBt);
         } else {
@@ -352,9 +368,6 @@ public class MainView extends VerticalLayout {
 
         return logSendsLayout;
     }
-
-    //TODO button setClicked nouvelle couleur
-    //TODO changer login pis signup en Dialog
 
     private void initComboboxes() {
         gymsCb.addFocusListener(focusEvent -> {
